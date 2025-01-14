@@ -1,0 +1,108 @@
+/* Categorias */
+
+.link_categoria {
+  background: var(--bs-danger);
+  color: #000000;
+  margin: 10px;
+  padding: 10px;
+  border-radius: 50px;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.link_categoria:hover {
+  background-color: lightblue;
+  color: white;
+}
+
+.link_categoria.selected {
+  background-color: var(--bs-secondary);
+  color: white;
+}
+
+#escolher_categoria {
+  margin-top: 50px;
+}
+
+/* Certificados */
+
+#certificacao {
+  padding-top: 30px;
+}
+
+/* Produtos */
+
+#container_produtos {
+  margin-top: 50px;
+}
+
+/* Menu NavBar */
+
+#heading_navbar {
+  margin-left: 275px;
+  color: var(--bs-light);
+}
+
+/* Responsividade----------------------------------- */
+
+/* navBar */
+
+@media (max-width: 1200px) {
+  #heading_navbar {
+    margin-left: 180px;
+  }
+}
+
+@media (max-width: 992px) {
+  #heading_navbar {
+    margin-left: 100px;
+  }
+}
+
+@media (max-width: 768px) {
+  #heading_navbar {
+    display: none;
+  }
+}
+
+/* Categorias */
+
+@media (max-width: 576px) {
+  .link_categoria {
+    margin: 2px;
+    padding: 5px;
+  }
+}
+
+/* Section Certificado */
+
+@media (min-width: 992px) {
+  #iso {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  #certificacao {
+    display: none;
+  }
+}
+
+/* EFEITOS------------------------------------------------- */
+
+/* Efeito para os cards produtos */
+
+#produtos-slide-in {
+  animation: slide-in 0.8s ease-out;
+}
+
+@keyframes slide-in {
+  0% {
+    transform: translateX(100%) rotate(360deg);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0) rotate(0deg);
+    opacity: 1;
+  }
+}
+

@@ -1,0 +1,30 @@
+/* Table Header */
+
+#cabecalho_table {
+  font-size: 13px;
+}
+
+/* Table Body */
+
+#produtosTabela {
+  font-size: 13px;
+}
+
+/* MODAL EDITAR PRODUTO */
+
+.form_table_modal {
+  margin-top: 5px;
+}
+
+#img_table_modal {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 4px;
+  display: block;
+}
+
+#progressContainer {
+  display: none;
+}
+
