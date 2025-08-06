@@ -198,9 +198,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             produtos.forEach((produto) => {
                 const linha = document.createElement("tr");
+                linha.setAttribute('data-id', produto.id); // Adiciona o ID como atributo
+                linha.setAttribute('data-ordem', produto.ordem); // Adiciona a ordem atual
                 linha.innerHTML = `
-                    <td><img id="img_table_modal" src="${produto.url_img}"       alt="${produto.descricao_prod}"/>
-                    </td>
+                    <td><img id="img_table_modal" src="${produto.url_img}" alt="${produto.descricao_prod}"/></td>
                     <td>${produto.descricao_prod}</td>
                     <td>${produto.cod_produto}</td>
                     <td class="text-center">${produto.categorias?.nome_categoria || "Sem categoria"}</td>
@@ -217,6 +218,62 @@ document.addEventListener("DOMContentLoaded", async () => {
                     </td>
                 `;
                 tabelaBody.appendChild(linha);
+            });
+
+            // Inicializa o SortableJS após criar a tabela
+            if (!codigoProduto) { // Só habilita drag and drop se não estiver filtrando
+                inicializarSortable();
+            }
+        }
+
+        function inicializarSortable() {
+            const tabelaBody = document.getElementById("produtosTabela");
+            
+            new Sortable(tabelaBody, {
+                animation: 150,
+                handle: 'td', // Permite arrastar por qualquer célula
+                ghostClass: 'sortable-ghost', // Classe para o elemento fantasma
+                chosenClass: 'sortable-chosen', // Classe para o elemento selecionado
+                dragClass: 'sortable-drag', // Classe durante o arrasto
+                
+                onEnd: async function(evt) {
+                    // Obtém todos os itens na nova ordem
+                    const linhas = tabelaBody.querySelectorAll('tr[data-id]');
+                    const updates = [];
+                    
+                    // Prepara as atualizações para cada item
+                    linhas.forEach((linha, index) => {
+                        const id = linha.getAttribute('data-id');
+                        const novaOrdem = index + 1; // +1 para começar de 1
+                        
+                        updates.push({
+                            id: parseInt(id, 10),
+                            ordem: novaOrdem
+                        });
+                        
+                        // Atualiza o atributo e a célula de ordem
+                        linha.setAttribute('data-ordem', novaOrdem);
+                        linha.querySelector('td:nth-child(9)').textContent = novaOrdem;
+                    });
+                    
+                    // Atualiza todas as ordens no banco de dados
+                    try {
+                        const { error } = await supabase
+                            .from('produtos')
+                            .upsert(updates); // Usa upsert para atualizar múltiplos registros
+                        
+                        if (error) {
+                            console.error('Erro ao atualizar ordens:', error);
+                            // Reverte visualmente se houver erro
+                            buscarProdutos();
+                        } else {
+                            console.log('Ordens atualizadas com sucesso!');
+                        }
+                    } catch (err) {
+                        console.error('Erro ao atualizar ordens:', err);
+                        buscarProdutos(); // Recarrega se houver erro
+                    }
+                }
             });
         }
 

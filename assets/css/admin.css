@@ -28,3 +28,18 @@
   display: none;
 }
 
+/* Adicione ao seu arquivo CSS */
+.sortable-ghost {
+    opacity: 0.5;
+    background: #c8ebfb;
+}
+
+.sortable-chosen {
+    background: #f8f9fa;
+}
+
+.sortable-drag {
+    opacity: 1 !important;
+    background: white;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
