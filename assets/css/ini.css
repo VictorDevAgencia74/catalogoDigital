@@ -1,3 +1,7 @@
+.card {
+    margin: 0.25rem;
+}
+
 /* Categorias */
 
 .link_categoria {
@@ -43,6 +47,16 @@
 }
 
 /* Responsividade----------------------------------- */
+
+@media (max-width: 576px) {
+    .card-title {
+        font-size: 0.9rem;
+    }
+
+    .card-text {
+        font-size: 0.8rem;
+    }
+}
 
 /* navBar */
 

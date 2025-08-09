@@ -3,6 +3,32 @@ const supabaseUrl = 'https://llonxwrjeipjxpdjijvd.supabase.co';
 const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxsb254d3JqZWlwanhwZGppanZkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzM4NTI3NDEsImV4cCI6MjA0OTQyODc0MX0.k6iVRq6qoc6D8eetY7N80oWysfttvRBQ5xceiKonEJA';
 const supabaseClient = supabase.createClient(supabaseUrl, supabaseAnonKey);
 
+// Cache de categorias
+let categoriasCache = {};
+
+// Função para buscar todas as categorias
+async function buscarCategorias() {
+    try {
+        const { data, error } = await supabaseClient
+            .from('categorias')
+            .select('id, nome_categoria')  // Usando o nome correto da coluna
+            .order('id', { ascending: true });
+
+        if (error) throw error;
+
+        // Transforma o array de categorias em um objeto {id: nome}
+        categoriasCache = data.reduce((acc, categoria) => {
+            acc[categoria.id] = categoria.nome_categoria;  // Usando nome_categoria
+            return acc;
+        }, {});
+
+        return categoriasCache;
+    } catch (error) {
+        console.error('Erro ao buscar categorias:', error.message);
+        return {};
+    }
+}
+
 // Função para formatar preços
 const formatarPreco = (valor) => {
     return new Intl.NumberFormat('pt-BR', {
@@ -11,118 +37,180 @@ const formatarPreco = (valor) => {
     }).format(valor);
 };
 
-// Função para buscar e exibir produtos com filtro opcional
+// Função principal para buscar e exibir produtos
 async function buscarProdutos(categoriaId = null) {
     try {
+        // Primeiro busca as categorias se não estiverem em cache
+        if (Object.keys(categoriasCache).length === 0) {
+            await buscarCategorias();
+        }
+
+        // Consulta para produtos
         let query = supabaseClient
             .from('produtos')
-            .select('id, descricao_prod, cod_produto, preco_unid, preco_fardo, preco_unid_avista, preco_fardo_avista, url_img')
-            .order('ordem'); // Adiciona ordenação pela coluna "ordem"
+            .select('id, descricao_prod, cod_produto, preco_unid, preco_fardo, preco_unid_avista, preco_fardo_avista, url_img, categoria_id')
+            .order('ordem', { ascending: true });
 
-        // Filtrar por categoria, se o ID da categoria for fornecido
+        // Aplica filtro se necessário
         if (categoriaId) {
             query = query.eq('categoria_id', categoriaId);
+        } else {
+            query = query.order('categoria_id', { ascending: true });
         }
 
-        const { data, error } = await query;
-
-        if (error) {
-            console.error('Erro ao buscar produtos:', error.message);
-            return;
-        }
+        const { data: produtos, error } = await query;
+        if (error) throw error;
 
         const container = document.getElementById('produtos');
         container.innerHTML = '';
 
-        if (data.length === 0) {
-            container.innerHTML = `<p class="text-center">Nenhum produto encontrado para esta categoria.</p>`;
+        if (!produtos || produtos.length === 0) {
+            container.innerHTML = `<p class="text-center">Nenhum produto encontrado.</p>`;
             return;
         }
 
-        data.forEach((produto) => {
+        // Se estiver filtrado por categoria
+        if (categoriaId) {
+            const categoriaNome = categoriasCache[categoriaId] || 'Produtos';
+            container.innerHTML += `<h3 class="text-primary my-3">${categoriaNome}</h3>`;
+
+            const produtosRow = document.createElement('div');
+            produtosRow.className = 'row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-5 g-3';
+            container.appendChild(produtosRow);
+
+            produtos.forEach(produto => {
+                produtosRow.innerHTML += criarCardProduto(produto);
+            });
+        }
+        // Se não estiver filtrado (mostrar todos agrupados por categoria)
+        else {
+            const produtosAgrupados = agruparProdutosPorCategoria(produtos);
+
+            for (const [categoriaId, produtos] of Object.entries(produtosAgrupados)) {
+                const categoriaNome = categoriasCache[categoriaId] || 'Outros';
+                container.innerHTML += `<h3 class="text-primary mt-4 mb-2">${categoriaNome}</h3>`;
+
+                const produtosRow = document.createElement('div');
+                produtosRow.className = 'row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-5 g-3';
+                container.appendChild(produtosRow);
+
+                produtos.forEach(produto => {
+                    produtosRow.innerHTML += criarCardProduto(produto);
+                });
+            }
+        }
+
+    } catch (error) {
+        console.error('Erro ao buscar produtos:', error.message);
+    }
+}
+
+// Funções auxiliares
+function agruparProdutosPorCategoria(produtos) {
+    return produtos.reduce((acc, produto) => {
+        const categoriaId = produto.categoria_id;
+        if (!acc[categoriaId]) {
+            acc[categoriaId] = [];
+        }
+        acc[categoriaId].push(produto);
+        return acc;
+    }, {});
+}
+
+function criarCardProduto(produto) {
+    return `
+        <div class="col produto-slide-in">
+            <div class="card h-100 rounded-4 shadow-sm border-0">
+                <div class="card-header text-center bg-light rounded-top-4 p-2">
+                    <h6 class="card-title text-primary mb-1">${produto.descricao_prod}</h6>
+                    <small class="text-muted">Código: ${produto.cod_produto}</small>
+                </div>
+                <div class="card-body d-flex flex-column p-3">
+                    <div class="text-center mb-2 flex-grow-1 d-flex align-items-center justify-content-center">
+                        <img src="${produto.url_img}" alt="${produto.descricao_prod}" 
+                            class="img-fluid rounded-3" style="height: 80px; object-fit: cover;">
+                    </div>
+                    <button class="btn btn-sm btn-outline-primary mt-auto" 
+                        data-bs-toggle="modal"
+                        data-bs-target="#modalDetalhes" 
+                        data-produto-id="${produto.id}">
+                        Detalhes
+                    </button>
+                </div>
+            </div>
+        </div>`;
+}
+
+// Função para buscar detalhes do produto
+async function buscarDetalhesProduto(produtoId) {
+    try {
+        const { data, error } = await supabaseClient
+            .from('produtos')
+            .select('*')
+            .eq('id', produtoId)
+            .single();
+
+        if (error) throw error;
+
+        return data;
+    } catch (error) {
+        console.error('Erro ao buscar detalhes do produto:', error.message);
+        return null;
+    }
+}
+
+// Evento para carregar detalhes no modal
+document.addEventListener('click', async (e) => {
+    if (e.target.matches('[data-bs-target="#modalDetalhes"]')) {
+        e.preventDefault();
+        const produtoId = e.target.getAttribute('data-produto-id');
+        const produto = await buscarDetalhesProduto(produtoId);
+
+        if (produto) {
             const precoUnidAvista = formatarPreco(produto.preco_unid_avista || 0);
             const precoFardoAvista = formatarPreco(produto.preco_fardo_avista || 0);
             const precoUnid = formatarPreco(produto.preco_unid || 0);
             const precoFardo = formatarPreco(produto.preco_fardo || 0);
+            const categoriaNome = categoriasCache[produto.categoria_id] || 'Sem Categoria';
 
-            const produtoHTML = `
-                <div class="col-md-4 mb-4 produto-slide-in">
-                    <div class="card h-100 rounded-4 shadow-lg border-0">
-                        <div class="card-header text-center bg-light rounded-top-4">
-                            <h6 class="card-title text-primary">${produto.descricao_prod}</h6>
-                            <div class="d-flex  justify-content-between">
-                                <h7 class="card-title text-primary">Código: ${produto.cod_produto}</h7>
-                                <button href="#" class="btn btn-outline-secondary" data-bs-toggle="modal"
-                                data-bs-target="#modalSabores" 
-                                data-produto-id="${produto.id}">
-                                    Mais Aqui
-                                </button>
+            const modalBody = document.getElementById('modalDetalhesBody');
+            modalBody.innerHTML = `
+                <div class="row">
+                    <div class="col-md-5 text-center">
+                        <img src="${produto.url_img}" alt="${produto.descricao_prod}" 
+                            class="img-fluid rounded-3 mb-3" style="max-height: 200px;">
+                    </div>
+                    <div class="col-md-7">
+                        <h5>${produto.descricao_prod}</h5>
+                        <p><small class="text-muted">Código: ${produto.cod_produto}</small></p>
+                        <p><small class="text-muted">Categoria: ${categoriaNome}</small></p>
+                        
+                        <div class="mb-3">
+                            <h6 class="text-primary">Preços</h6>
+                            <div class="row">
+                                <div class="col-6">
+                                    <p class="mb-1"><strong>À Vista:</strong></p>
+                                    <p class="mb-1">Unidade: <strong>R$ ${precoUnidAvista}</strong></p>
+                                    <p class="mb-1">Fardo: <strong>R$ ${precoFardoAvista}</strong></p>
+                                </div>
+                                <div class="col-6">
+                                    <p class="mb-1"><strong>À Prazo:</strong></p>
+                                    <p class="mb-1">Unidade: <strong>R$ ${precoUnid}</strong></p>
+                                    <p class="mb-1">Fardo: <strong>R$ ${precoFardo}</strong></p>
+                                </div>
                             </div>
                         </div>
-                        <div class="card-body d-flex">
-                            <div class="col-5 text-center d-flex align-items-center justify-content-center">
-                                <img src="${produto.url_img}" alt="${produto.descricao_prod}" 
-                                    class="img-fluid rounded-3" style="height: 150px; object-fit: cover;">
-                            </div>
-                            <div class="col-7">
-                                <div>
-                                    <p class="text-muted mb-2 bg-danger rounded-5 ms-4"><strong>Valor a Vista:</strong></p>
-                                    <p class="text-muted mb-2 ms-4">Unidade: &nbsp &nbsp  <strong>R$ ${precoUnidAvista}</strong></p>
-                                    <p class="text-muted mb-2 ms-4">Fardo:&nbsp &nbsp &nbsp &nbsp &nbsp <strong>R$ ${precoFardoAvista}</strong></p>
-                                </div>
-                                <div>
-                                    <p class="text-muted mb-2 bg-danger rounded-2 ms-4"><strong>Valor a Prazo:</strong></p>
-                                    <p class="text-muted mb-2 ms-4">Unidade: &nbsp &nbsp  <strong>R$ ${precoUnid}</strong></p>
-                                    <p class="text-muted mb-2 ms-4">Fardo:&nbsp &nbsp &nbsp &nbsp &nbsp <strong>R$ ${precoFardo}</strong></p>
-                                </div>
-                            </div>
+                        
+                        <div>
+                            <h6 class="text-primary">Sabores/Disponibilidade</h6>
+                            <p>${produto.desc_disponivel || 'Nenhuma informação adicional disponível.'}</p>
                         </div>
                     </div>
-                </div>`;
-            
-            container.innerHTML += produtoHTML;
-        });
-    } catch (erro) {
-        console.error('Erro inesperado:', erro);
-    }
-}
-
-// Evento para carregar sabores no modal
-document.addEventListener('click', (e) => {
-    if (e.target.matches('[data-bs-target="#modalSabores"]')) {
-        e.preventDefault();
-        const produtoId = e.target.getAttribute('data-produto-id');
-        buscarSabores(produtoId);
+                </div>
+            `;
+        }
     }
 });
-
-// Função para buscar sabores
-async function buscarSabores(produtoId) {
-    try {
-        const { data, error } = await supabaseClient
-            .from('produtos')
-            .select('desc_disponivel')
-            .eq('id', produtoId);
-
-        if (error) {
-            console.error('Erro ao buscar sabores:', error.message);
-            return;
-        }
-
-        const listaSabores = document.getElementById('listaSabores');
-        listaSabores.innerHTML = ''; 
-
-        if (data.length === 0 || !data[0].desc_disponivel) {
-            listaSabores.innerHTML = '<li class="list-group-item">Nenhum sabor disponível.</li>';
-            return;
-        }
-
-        // Exibir o conteúdo de desc_disponivel
-        listaSabores.innerHTML = `<li class="list-group-item">${data[0].desc_disponivel}</li>`;
-    } catch (erro) {
-        console.error('Erro inesperado:', erro);
-    }
-}
 
 // Adiciona evento de clique para categorias
 document.querySelectorAll('#categorias a').forEach((link) => {
@@ -133,9 +221,10 @@ document.querySelectorAll('#categorias a').forEach((link) => {
             buscarProdutos(categoriaId);
         }
     });
-}); 
+});
 
-// Carrega todos os produtos automaticamente ao carregar a página
-document.addEventListener('DOMContentLoaded', () => {
-    buscarProdutos(); // Chama a função sem parâmetro para buscar todos os produtos
+// Carrega todos os dados ao iniciar
+document.addEventListener('DOMContentLoaded', async () => {
+    await buscarCategorias();
+    await buscarProdutos();
 });
