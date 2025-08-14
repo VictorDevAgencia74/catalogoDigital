@@ -1,0 +1,47 @@
+/* Table Header */
+
+#cabecalho_table {
+  font-size: 13px;
+}
+
+/* Table Body */
+
+#produtosTabela {
+  font-size: 13px;
+}
+
+/* MODAL EDITAR PRODUTO */
+
+.form_table_modal {
+  margin-top: 5px;
+}
+
+#img_table_modal {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 4px;
+  display: block;
+}
+
+#progressContainer {
+  display: none;
+}
+
+/* Adicione ao seu arquivo CSS */
+
+.sortable-ghost {
+  opacity: 0.5;
+  background: #c8ebfb;
+}
+
+.sortable-chosen {
+  background: #f8f9fa;
+}
+
+.sortable-drag {
+  opacity: 1 !important;
+  background: white;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+

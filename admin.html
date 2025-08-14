@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html data-bs-theme="light" lang="pt-br" data-bss-forced-theme="light">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title>IgorValen_cardapioDigital</title>
+    <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Abril+Fatface&amp;display=swap">
+    <link rel="stylesheet" href="assets/css/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="assets/css/css/bs-theme-overrides.css">
+    <link rel="stylesheet" href="assets/css/css/admin.css">
+    <link rel="stylesheet" href="assets/css/css/ini.css">
+    <link rel="stylesheet" href="assets/css/css/login.css">
+    <link rel="stylesheet" href="assets/css/css/navbar.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-md bg-primary py-3b" id="navbar">
+        <div class="container"><a class="navbar-brand d-flex align-items-center" href="#">
+                <div><span id="text_nome_logo">Igor</span><span id="text_sobre_logo" class="text_logo">Valen</span>
+                    <p id="text_desc_logo">Distribuidora</p>
+                </div>
+            </a><button data-bs-toggle="collapse" data-bs-target="#navcol-1" class="navbar-toggler"><span class="visually-hidden">Toggle navigation</span><span class="navbar-toggler-icon"></span></button>
+            <div class="collapse navbar-collapse d-lg-flex justify-content-lg-end" id="navcol-1">
+                <ul class="navbar-nav">
+                    <li class="nav-item"><a class="nav-link active link-light" href="login.html" id="logoutButton">SAIR</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <main>
+        <section>
+            <div class="container d-flex justify-content-between py-2">
+                <h3>Dashboard ADM</h3>
+                <div class="d-flex justify-content-xl-center align-items-xl-center" id="search"><a id="buscarProdutoLink" href="admin.html"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewbox="0 0 24 24" fill="none" class="fs-3" id="icon_search"><path d="M15.8787 4.87866H3.87872V6.87866H15.8787V4.87866Z" fill="currentColor"></path><path d="M15.8787 8.87866H3.87872V10.8787H15.8787V8.87866Z" fill="currentColor"></path><path d="M3.87872 12.8787H11.8787V14.8787H3.87872V12.8787Z" fill="currentColor"></path><path fill-rule="evenodd" d="M13.7574 12.7573C12.5858 13.9289 12.5858 15.8284 13.7574 17C14.681 17.9236 16.0571 18.1191 17.1722 17.5864L18.7071 19.1213L20.1213 17.7071L18.5864 16.1722C19.1191 15.057 18.9236 13.681 18 12.7573C16.8284 11.5858 14.9289 11.5858 13.7574 12.7573ZM15.1716 15.5858C15.5621 15.9763 16.1953 15.9763 16.5858 15.5858C16.9763 15.1952 16.9763 14.5621 16.5858 14.1716C16.1953 13.781 15.5621 13.781 15.1716 14.1716C14.7811 14.5621 14.7811 15.1952 15.1716 15.5858Z" fill="currentColor"></path></svg></a><input class="border rounded d-xl-flex" type="search" id="codigoProdutoInput" placeholder="Código do Produto"></div>
+                <div class="btn-group"><button class="btn btn-primary link-light" type="button">ADICIONAR</button><button class="btn btn-primary dropdown-toggle dropdown-toggle-split link-light" data-bs-toggle="dropdown" aria-expanded="false" type="button"></button>
+                    <div class="dropdown-menu"><a class="dropdown-item" data-bs-target="#addModal" data-bs-toggle="modal" href="#">Add Produto</a><a class="dropdown-item" data-bs-target="#addModalCategoria" data-bs-toggle="modal" href="#">Add Categoria</a></div>
+                </div>
+                <div class="modal fade" role="dialog" tabindex="-1" id="addModal" aria-labelledby="editModalLabel" aria-hidden="false">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h4 class="modal-title">Adicione seus produtos!</h4><button class="btn-close" aria-label="Close" data-bs-dismiss="modal" type="button"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form id="addFormAdd">
+                                    <div class="form_table_modal"><label class="form-label" for="addDescricao">Produto</label><input class="form-control form-control" type="text" id="addDescricao"></div>
+                                    <div class="d-flex justify-content-between form_table_modal">
+                                        <div><label class="form-label" for="addCodigo">Código</label><input class="form-control form-control" type="text" id="addCodigo"></div>
+                                        <div><label class="form-label" for="addOrdem">Ordem dos Produtos</label><input class="form-control form-control" type="number" id="addOrdem" step="0.01"></div>
+                                    </div>
+                                    <div class="form_table_modal"><label class="form-label" for="addCategoria">Categoria</label><select class="form-select form-select" id="addCategoria"></select></div>
+                                    <div class="d-flex justify-content-between form_table_modal">
+                                        <div><label class="form-label" for="addPrecoUnidPrazo">Valor U.P.</label><input class="form-control form-control" type="number" id="addPrecoUnidPrazo" step="0.01"></div>
+                                        <div><label class="form-label" for="addPrecoFardoPrazo">Valor F.P.</label><input class="form-control form-control" type="number" id="addPrecoFardoPrazo" step="0.01"></div>
+                                    </div>
+                                    <div class="d-flex justify-content-between form_table_modal">
+                                        <div><label class="form-label" for="addPrecoUnidAvista">Valor U.V.</label><input class="form-control form-control" type="number" id="addPrecoUnidAvista" step="0.01"></div>
+                                        <div><label class="form-label" for="addPrecoFardoAvista">Valor F.V.</label><input class="form-control form-control" type="number" id="addPrecoFardoAvista" step="0.01"></div>
+                                    </div>
+                                    <div class="form_table_modal"><label class="form-label" for="addDescDisponivel">Label</label><textarea class="form-control form-control" id="addDescDisponivel"></textarea></div>
+                                    <div class="text-center my-3"><button class="btn btn-primary text-light" type="submit">ADICIONAR PRODUTO</button></div>
+                                </form>
+                            </div>
+                            <div class="modal-footer"><button class="btn btn-light" data-bs-dismiss="modal" type="button">Close</button></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal fade" role="dialog" tabindex="-1" id="addModalCategoria" aria-labelledby="editModalLabel" aria-hidden="false">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h4 class="modal-title">Ações Categorias</h4><button class="btn-close" aria-label="Close" data-bs-dismiss="modal" type="button"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="table-responsive">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th>Categorias</th>
+                                                <th>Excluir</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="categoriasTabela"></tbody>
+                                    </table>
+                                </div>
+                                <form id="addFormCategoria">
+                                    <div><label class="form-label" for="addListCategoria">Criar Categoria</label><input class="form-control form-control" type="text" id="addListCategoria"></div>
+                                    <div class="text-center my-3"><button class="btn btn-primary text-light" type="submit">ADICIONAR CATEGORIA</button></div>
+                                </form>
+                            </div>
+                            <div class="modal-footer"><button class="btn btn-light" data-bs-dismiss="modal" type="button">Close</button></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="container">
+                <div class="table-responsive border rounded" data-bs-target="#navbar">
+                    <table class="table table-striped table-hover table-bordered">
+                        <thead id="cabecalho_table">
+                            <tr>
+                                <th>Imagem</th>
+                                <th>Produto</th>
+                                <th class="ali">Código</th>
+                                <th class="text-center">Categoria</th>
+                                <th class="text-center">U.P.</th>
+                                <th class="text-center">F.P.</th>
+                                <th class="text-center">F.V.</th>
+                                <th class="text-center">U.V.</th>
+                                <th class="text-center">Ordem</th>
+                                <th class="text-center">Configurações</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-nowrap" id="produtosTabela"></tbody>
+                    </table>
+                </div>
+                <div class="modal fade" role="dialog" tabindex="-1" id="editModal" aria-labelledby="editModalLabel">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h4 class="modal-title">Editar Produtos</h4><button class="btn-close" aria-label="Close" data-bs-dismiss="modal" type="button"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form><label class="form-label" for="fileInput">Modificar Imagem</label>
+                                    <div class="d-flex justify-content-between"><input class="form-control form-control-sm form-control" type="file" id="fileInput"><button class="btn btn-primary btn-sm mx-2" id="uploadButton" type="button"><svg class="fs-5 text-light" fill="none" height="1em" viewbox="0 0 24 24" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M11 14.9861C11 15.5384 11.4477 15.9861 12 15.9861C12.5523 15.9861 13 15.5384 13 14.9861V7.82831L16.2428 11.0711L17.657 9.65685L12.0001 4L6.34326 9.65685L7.75748 11.0711L11 7.82854V14.9861Z" fill="currentColor"></path><path d="M4 14H6V18H18V14H20V18C20 19.1046 19.1046 20 18 20H6C4.89543 20 4 19.1046 4 18V14Z" fill="currentColor"></path></svg></button></div>
+                                    <p id="status"></p>
+                                    <div id="progressContainer">
+                                        <div class="progress" id="uploadProgress" max="100" value="0">
+                                            <div class="progress-bar" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100" style="width:50%;">50%</div>
+                                        </div>
+                                    </div>
+                                </form>
+                                <form id="editForm">
+                                    <div class="form_table_modal"><label class="form-label" for="editDescricao">Produto</label><input class="form-control form-control" type="text" id="editDescricao"></div>
+                                    <div class="d-flex justify-content-between form_table_modal">
+                                        <div><label class="form-label" for="editCodigo">Código</label><input class="form-control form-control" type="text" id="editCodigo"></div>
+                                        <div><label class="form-label" for="editOrdem">Ordem dos Produtos</label><input class="form-control form-control" type="number" id="editOrdem" step="0.01"></div>
+                                    </div>
+                                    <div class="form_table_modal"><label class="form-label" for="editCategoria">Categoria</label><select class="form-select form-select" id="editCategoria"></select></div>
+                                    <div class="d-flex justify-content-between form_table_modal">
+                                        <div><label class="form-label" for="editPrecoUnidPrazo">Valor U.P.</label><input class="form-control form-control" type="number" id="editPrecoUnidPrazo" step="0.01"></div>
+                                        <div><label class="form-label" for="editPrecoFardoPrazo">Valor F.P.</label><input class="form-control form-control" type="number" id="editPrecoFardoPrazo" step="0.01"></div>
+                                    </div>
+                                    <div class="d-flex justify-content-between form_table_modal">
+                                        <div><label class="form-label" for="editPrecoUnidAvista">Valor U.V.</label><input class="form-control form-control" type="number" id="editPrecoUnidAvista" step="0.01"></div>
+                                        <div><label class="form-label" for="editPrecoFardoAvista">Valor F.V.</label><input class="form-control form-control" type="number" id="editPrecoFardoAvista" step="0.01"></div>
+                                    </div>
+                                    <div class="form_table_modal"><label class="form-label">Observações sobre o produto</label><textarea class="form-control form-control" id="editDescDisponivel"></textarea></div>
+                                    <div class="text-center my-3"><button class="btn btn-primary text-light" type="submit">EDITAR PRODUTO</button></div>
+                                </form>
+                            </div>
+                            <div class="modal-footer"><button class="btn btn-light" data-bs-dismiss="modal" type="button">Close</button></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    <footer class="text-center">
+        <div class="container text-muted py-4 py-lg-5">
+            <ul class="list-inline">
+                <li class="list-inline-item me-4 list-inline-item"><a class="link-secondary" href="#">Bebidas</a></li>
+                <li class="list-inline-item me-4 list-inline-item"><a class="link-secondary" href="#">Alimentos</a></li>
+                <li class="list-inline-item list-inline-item"><a class="link-secondary" href="#">Utilitários</a></li>
+            </ul>
+            <ul class="list-inline">
+                <li class="list-inline-item me-4 list-inline-item"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewbox="0 0 16 16" class="bi bi-facebook"><path d="M16 8.049c0-4.446-3.582-8.05-8-8.05C3.58 0-.002 3.603-.002 8.05c0 4.017 2.926 7.347 6.75 7.951v-5.625h-2.03V8.05H6.75V6.275c0-2.017 1.195-3.131 3.022-3.131.876 0 1.791.157 1.791.157v1.98h-1.009c-.993 0-1.303.621-1.303 1.258v1.51h2.218l-.354 2.326H9.25V16c3.824-.604 6.75-3.934 6.75-7.951"></path></svg></li>
+                <li class="list-inline-item me-4 list-inline-item"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewbox="0 0 16 16" class="bi bi-twitter"><path d="M5.026 15c6.038 0 9.341-5.003 9.341-9.334 0-.14 0-.282-.006-.422A6.685 6.685 0 0 0 16 3.542a6.658 6.658 0 0 1-1.889.518 3.301 3.301 0 0 0 1.447-1.817 6.533 6.533 0 0 1-2.087.793A3.286 3.286 0 0 0 7.875 6.03a9.325 9.325 0 0 1-6.767-3.429 3.289 3.289 0 0 0 1.018 4.382A3.323 3.323 0 0 1 .64 6.575v.045a3.288 3.288 0 0 0 2.632 3.218 3.203 3.203 0 0 1-.865.115 3.23 3.23 0 0 1-.614-.057 3.283 3.283 0 0 0 3.067 2.277A6.588 6.588 0 0 1 .78 13.58a6.32 6.32 0 0 1-.78-.045A9.344 9.344 0 0 0 5.026 15"></path></svg></li>
+                <li class="list-inline-item list-inline-item"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewbox="0 0 16 16" class="bi bi-instagram"><path d="M8 0C5.829 0 5.556.01 4.703.048 3.85.088 3.269.222 2.76.42a3.917 3.917 0 0 0-1.417.923A3.927 3.927 0 0 0 .42 2.76C.222 3.268.087 3.85.048 4.7.01 5.555 0 5.827 0 8.001c0 2.172.01 2.444.048 3.297.04.852.174 1.433.372 1.942.205.526.478.972.923 1.417.444.445.89.719 1.416.923.51.198 1.09.333 1.942.372C5.555 15.99 5.827 16 8 16s2.444-.01 3.298-.048c.851-.04 1.434-.174 1.943-.372a3.916 3.916 0 0 0 1.416-.923c.445-.445.718-.891.923-1.417.197-.509.332-1.09.372-1.942C15.99 10.445 16 10.173 16 8s-.01-2.445-.048-3.299c-.04-.851-.175-1.433-.372-1.941a3.926 3.926 0 0 0-.923-1.417A3.911 3.911 0 0 0 13.24.42c-.51-.198-1.092-.333-1.943-.372C10.443.01 10.172 0 7.998 0h.003zm-.717 1.442h.718c2.136 0 2.389.007 3.232.046.78.035 1.204.166 1.486.275.373.145.64.319.92.599.28.28.453.546.598.92.11.281.24.705.275 1.485.039.843.047 1.096.047 3.231s-.008 2.389-.047 3.232c-.035.78-.166 1.203-.275 1.485a2.47 2.47 0 0 1-.599.919c-.28.28-.546.453-.92.598-.28.11-.704.24-1.485.276-.843.038-1.096.047-3.232.047s-2.39-.009-3.233-.047c-.78-.036-1.203-.166-1.485-.276a2.478 2.478 0 0 1-.92-.598 2.48 2.48 0 0 1-.6-.92c-.109-.281-.24-.705-.275-1.485-.038-.843-.046-1.096-.046-3.233 0-2.136.008-2.388.046-3.231.036-.78.166-1.204.276-1.486.145-.373.319-.64.599-.92.28-.28.546-.453.92-.598.282-.11.705-.24 1.485-.276.738-.034 1.024-.044 2.515-.045v.002zm4.988 1.328a.96.96 0 1 0 0 1.92.96.96 0 0 0 0-1.92zm-4.27 1.122a4.109 4.109 0 1 0 0 8.217 4.109 4.109 0 0 0 0-8.217zm0 1.441a2.667 2.667 0 1 1 0 5.334 2.667 2.667 0 0 1 0-5.334"></path></svg></li>
+            </ul>
+            <p class="text-center mb-0">Copyright © 2024 IgorValen</p>
+        </div>
+    </footer>
+    <script src="assets/bootstrap/js/bootstrap.min.js"></script>
+    <script src="assets/js/bootstrap/js/bootstrap.min.js"></script>
+    <script src="assets/js/js/admin.js"></script>
+    <script src="assets/js/js/modals.js"></script>
+    <script src="assets/js/js/efeitos.js"></script>
+</body>
+
+</html>
